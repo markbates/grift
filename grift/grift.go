@@ -66,6 +66,7 @@ func Remove(name string) error {
 	lock.Lock()
 	defer lock.Unlock()
 	delete(griftList, name)
+	delete(descriptions, name)
 	return nil
 }
 
@@ -115,7 +116,7 @@ func Exec(args []string, verbose bool) error {
 	case "list":
 		PrintGrifts(os.Stdout)
 	default:
-		c := NewContext()
+		c := NewContext(name)
 		c.Verbose = verbose
 		if len(args) >= 1 {
 			c.Args = args[1:]
