@@ -1,8 +1,9 @@
 package grift
 
 type Context struct {
-	Args []string
-	data map[string]interface{}
+	Args    []string
+	Verbose bool
+	data    map[string]interface{}
 }
 
 func (c *Context) Get(key string) interface{} {

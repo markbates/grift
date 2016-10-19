@@ -26,4 +26,4 @@ generated/
 .vendor/
 bin/*
 gin-bin
-tasks/
+grifts/

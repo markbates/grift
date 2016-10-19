@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"html/template"
@@ -11,10 +11,11 @@ import (
 )
 
 type grifter struct {
-	CurrentDir       string
-	BuildPath        string
-	TasksPackagePath string
-	ExePath          string
+	CurrentDir        string
+	BuildPath         string
+	GriftsPackagePath string
+	ExePath           string
+	Verbose           bool
 }
 
 func newGrifter() (*grifter, error) {
@@ -27,7 +28,7 @@ func newGrifter() (*grifter, error) {
 	g.CurrentDir = pwd
 	base := randx.String(10)
 	g.BuildPath = path.Join(os.Getenv("GOPATH"), "src", "grift.build", base)
-	g.TasksPackagePath = path.Join("grift.build", base, "tasks")
+	g.GriftsPackagePath = path.Join("grift.build", base, "grifts")
 	return g, nil
 }
 
@@ -41,12 +42,12 @@ func (g *grifter) Setup() error {
 }
 
 func (g *grifter) Build() error {
-	err := g.copyTasks()
+	err := g.copyGrifts()
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(path.Join(g.BuildPath, "tasks", "grift_loader.go"), []byte(loaderTmpl), 0644)
+	err = ioutil.WriteFile(path.Join(g.BuildPath, "grifts", "grift_loader.go"), []byte(loaderTmpl), 0644)
 	if err != nil {
 		return err
 	}
@@ -74,7 +75,7 @@ func (g *grifter) TearDown() error {
 	return os.RemoveAll(g.BuildPath)
 }
 
-func (g *grifter) copyTasks() error {
-	cp := exec.Command("cp", "-rv", path.Join(g.CurrentDir, "tasks"), g.BuildPath)
+func (g *grifter) copyGrifts() error {
+	cp := exec.Command("cp", "-rv", path.Join(g.CurrentDir, "grifts"), g.BuildPath)
 	return cp.Run()
 }
