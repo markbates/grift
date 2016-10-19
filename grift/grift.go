@@ -16,6 +16,9 @@ var lock = &sync.Mutex{}
 
 type Grift func(c *Context) error
 
+// Add a grift. If there is already a grift
+// with the given name the two grifts will
+// be bundled together.
 func Add(name string, grift Grift) error {
 	lock.Lock()
 	defer lock.Unlock()
@@ -34,6 +37,8 @@ func Add(name string, grift Grift) error {
 	return nil
 }
 
+// Set a grift. This is similar to `Add` but it will
+// overwrite an existing grift with the same name.
 func Set(name string, grift Grift) error {
 	lock.Lock()
 	defer lock.Unlock()
@@ -41,6 +46,9 @@ func Set(name string, grift Grift) error {
 	return nil
 }
 
+// Rename a grift. Useful if you want to re-define
+// an existing grift, but don't want to write over
+// the original.
 func Rename(old string, new string) error {
 	lock.Lock()
 	defer lock.Unlock()
@@ -52,6 +60,8 @@ func Rename(old string, new string) error {
 	return nil
 }
 
+// Remove a grift. Not incredibly useful, but here for
+// completeness.
 func Remove(name string) error {
 	lock.Lock()
 	defer lock.Unlock()
@@ -59,6 +69,9 @@ func Remove(name string) error {
 	return nil
 }
 
+// Desc sets a helpful descriptive text for a grift.
+// This description will be shown when `grift list`
+// is run.
 func Desc(name string, description string) error {
 	lock.Lock()
 	defer lock.Unlock()
@@ -66,6 +79,8 @@ func Desc(name string, description string) error {
 	return nil
 }
 
+// Run a grift. This allows for the chaining for grifts.
+// One grift can Run another grift and so on.
 func Run(name string, c *Context) error {
 	if griftList[name] == nil {
 		return fmt.Errorf("No grift named %s defined!", name)
@@ -79,7 +94,8 @@ func Run(name string, c *Context) error {
 	return griftList[name](c)
 }
 
-func GriftNames() []string {
+// List of the names of the defined grifts.
+func List() []string {
 	keys := []string{}
 	for k := range griftList {
 		keys = append(keys, k)
@@ -88,6 +104,8 @@ func GriftNames() []string {
 	return keys
 }
 
+// Exec the grift stack. This is the main "entry point" to
+// the grift system.
 func Exec(args []string, verbose bool) error {
 	name := "default"
 	if len(args) >= 1 {
@@ -110,8 +128,10 @@ func Exec(args []string, verbose bool) error {
 	return nil
 }
 
+// PrintGrifts to the screen, nice, sorted, and with descriptions,
+// should they exist.
 func PrintGrifts(w io.Writer) {
-	for _, k := range GriftNames() {
+	for _, k := range List() {
 		m := fmt.Sprintf("grift %s", k)
 		desc := descriptions[k]
 		if desc != "" {
