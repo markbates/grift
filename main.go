@@ -26,9 +26,15 @@ func init() {
 }
 
 func main() {
-	if len(os.Args) == 2 && os.Args[1] == "jim" {
-		jimTribute()
-		return
+	if len(os.Args) == 2 {
+		switch os.Args[1] {
+		case "jim":
+			jimTribute()
+			return
+		case "init":
+			generateInit()
+			return
+		}
 	}
 
 	flag.BoolVar(&verboseFlag, "v", false, "Print out verbose/debugging information when running a grift")
