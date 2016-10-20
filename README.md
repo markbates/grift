@@ -46,8 +46,70 @@ $ grift list
 $ grift hello
 ```
 
-##
+## That's it!
 
 That's really it! Grift is meant to be simple. Write your grifts, use the full power of Go to do it.
 
 For more information I would highly recommend checking out the [docs](https://godoc.org/github.com/markbates/grift/grift).
+
+
+### Examples:
+
+```go
+package grifts
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"strings"
+
+	. "github.com/markbates/grift/grift"
+)
+
+var _ = Add("boom", func(c *Context) error {
+	return errors.New("boom!!!")
+})
+
+var _ = Add("hello", func(c *Context) error {
+	fmt.Println("Hello World!")
+	return nil
+})
+
+var _ = Add("hello", func(c *Context) error {
+	fmt.Println("Hello World! Again")
+	err := Run("db:migrate", c)
+	if err != nil {
+		return err
+	}
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("### dir -> %+v\n", dir)
+	return nil
+})
+
+var _ = Add("env:print", func(c *Context) error {
+	if len(c.Args) >= 1 {
+		for _, e := range c.Args {
+			fmt.Printf("%s=%s\n", e, os.Getenv(e))
+		}
+	} else {
+		for _, e := range os.Environ() {
+			pair := strings.Split(e, "=")
+			fmt.Printf("%s=%s\n", pair[0], os.Getenv(pair[0]))
+		}
+	}
+
+	return nil
+})
+
+var _ = Desc("db:migrate", "Migrates the databases")
+var _ = Set("db:migrate", func(c *Context) error {
+	fmt.Println("db:migrate")
+	fmt.Printf("### args -> %+v\n", c.Args)
+	return nil
+})
+
+```
