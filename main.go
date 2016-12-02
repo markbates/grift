@@ -8,7 +8,6 @@ import (
 	"os/exec"
 )
 
-var Version = "0.1.0"
 var currentGrift *grifter
 var verboseFlag bool
 
