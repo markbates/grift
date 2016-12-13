@@ -24,15 +24,15 @@ func init() {
 	}
 }
 
-func main() {
-	if len(os.Args) == 2 {
-		switch os.Args[1] {
+func Run(args []string) error {
+	if len(args) == 2 {
+		switch args[1] {
 		case "jim":
 			jimTribute()
-			return
+			return nil
 		case "init":
 			generateInit()
-			return
+			return nil
 		}
 	}
 
@@ -41,16 +41,19 @@ func main() {
 
 	err := setup()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = run()
 	if err != nil {
-		os.Exit(-1)
-		return
+		return err
 	}
 
-	err = currentGrift.TearDown()
+	return currentGrift.TearDown()
+}
+
+func main() {
+	err := Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
