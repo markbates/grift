@@ -1,3 +1,3 @@
-package main
+package cmd
 
 var Version = "0.2.0"

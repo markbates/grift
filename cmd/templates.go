@@ -1,4 +1,4 @@
-package main
+package cmd
 
 var loaderTmpl = `
 package grifts
