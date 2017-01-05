@@ -8,7 +8,7 @@ import (
 )
 
 func generateInit() {
-	err := os.MkdirAll("./grifts", 0644)
+	err := os.MkdirAll("./grifts", 0766)
 	if err != nil {
 		log.Fatal(err)
 	}
