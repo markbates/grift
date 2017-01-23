@@ -24,7 +24,7 @@ $ grift jim
 
 ## Usage/Getting Started
 
-Apart from having the binary installed, the only other requirement is that the package you place your grifts in is called `grift`. That's it.
+Apart from having the binary installed, the only other requirement is that the package you place your grifts in is called `grifts`. That's it.
 
 By running the following command:
 
