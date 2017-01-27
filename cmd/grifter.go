@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"html/template"
 	"io/ioutil"
 	"os"
@@ -26,6 +27,19 @@ func newGrifter() (*grifter, error) {
 		return g, err
 	}
 	g.CurrentDir = pwd
+
+	stat, err := os.Stat(path.Join(pwd, "grifts"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			return g, errors.New("There is no directory named 'grifts'. Run 'grift init' or switch to the appropriate directory.")
+		}
+		return g, err
+	}
+
+	if !stat.IsDir() {
+		return g, errors.New("There should be a directory named 'grifts', not a file.")
+	}
+
 	base := randx.String(10)
 	g.BuildPath = path.Join(os.Getenv("GOPATH"), "src", "grift.build", base)
 	g.GriftsPackagePath = path.Join("grift.build", base, "grifts")
