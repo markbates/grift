@@ -3,13 +3,11 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 )
 
 var currentGrift *grifter
-var verboseFlag bool
 
 func init() {
 	flag.Usage = func() {
@@ -17,14 +15,14 @@ func init() {
 
 		fmt.Print("\nUsage:\n")
 
-		fmt.Println("grift [options] <task name> [task arguments]")
+		fmt.Println("grift <task name> [task arguments]")
 
 		fmt.Println("\nFlags/Options:")
 		flag.PrintDefaults()
 	}
 }
 
-func Run(args []string) error {
+func Run(name string, args []string) error {
 	if len(args) == 2 {
 		switch args[1] {
 		case "jim":
@@ -36,15 +34,12 @@ func Run(args []string) error {
 		}
 	}
 
-	flag.BoolVar(&verboseFlag, "v", false, "Print out verbose/debugging information when running a grift")
-	flag.Parse()
-
-	err := setup()
+	err := setup(name)
 	if err != nil {
 		return err
 	}
 
-	err = run()
+	err = run(args)
 	if err != nil {
 		return err
 	}
@@ -52,16 +47,9 @@ func Run(args []string) error {
 	return currentGrift.TearDown()
 }
 
-func main() {
-	err := Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func run() error {
+func run(args []string) error {
 	rargs := []string{"run", currentGrift.ExePath}
-	rargs = append(rargs, flag.Args()...)
+	rargs = append(rargs, args...)
 	runner := exec.Command("go", rargs...)
 	runner.Stdin = os.Stdin
 	runner.Stdout = os.Stdout
@@ -78,13 +66,12 @@ func list() error {
 	return runner.Run()
 }
 
-func setup() error {
+func setup(name string) error {
 	var err error
-	currentGrift, err = newGrifter()
+	currentGrift, err = newGrifter(name)
 	if err != nil {
 		return err
 	}
-	currentGrift.Verbose = verboseFlag
 	err = currentGrift.Setup()
 	if err != nil {
 		return err

@@ -1,20 +1,19 @@
 package cmd
 
-var loaderTmpl = `
-package grifts
-
-func Load() {}`
-
 var mainTmpl = `
 package main
 
-import "{{.GriftsPackagePath}}"
+import _ "{{.GriftsPackagePath}}"
 import "os"
+import "log"
 import "github.com/markbates/grift/grift"
 
 func main() {
-	grifts.Load()
-	grift.Exec(os.Args[1:], {{.Verbose}})
+	grift.CommandName = "{{.CommandName}}"
+	err := grift.Exec(os.Args[1:], false)
+	if err != nil {
+		log.Fatal(err)
+	}
 }`
 
 var initTmpl = `

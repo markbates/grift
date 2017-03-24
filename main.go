@@ -1,15 +1,14 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/markbates/grift/cmd"
 )
 
 func main() {
-	err := cmd.Run(os.Args)
+	err := cmd.Run("grift", os.Args[1:])
 	if err != nil {
-		log.Fatal(err)
+		os.Exit(-1)
 	}
 }

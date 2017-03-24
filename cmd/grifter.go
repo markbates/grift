@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"errors"
 	"html/template"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
 
 	"github.com/markbates/going/randx"
+	"github.com/pkg/errors"
 )
 
 type grifter struct {
@@ -16,11 +15,14 @@ type grifter struct {
 	BuildPath         string
 	GriftsPackagePath string
 	ExePath           string
+	CommandName       string
 	Verbose           bool
 }
 
-func newGrifter() (*grifter, error) {
-	g := &grifter{}
+func newGrifter(name string) (*grifter, error) {
+	g := &grifter{
+		CommandName: name,
+	}
 
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -31,7 +33,7 @@ func newGrifter() (*grifter, error) {
 	stat, err := os.Stat(path.Join(pwd, "grifts"))
 	if err != nil {
 		if os.IsNotExist(err) {
-			return g, errors.New("There is no directory named 'grifts'. Run 'grift init' or switch to the appropriate directory.")
+			return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory.", name)
 		}
 		return g, err
 	}
@@ -57,11 +59,6 @@ func (g *grifter) Setup() error {
 
 func (g *grifter) Build() error {
 	err := g.copyGrifts()
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(path.Join(g.BuildPath, "grifts", "grift_loader.go"), []byte(loaderTmpl), 0644)
 	if err != nil {
 		return err
 	}
