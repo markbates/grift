@@ -1,14 +1,17 @@
 package cmd
 
 import (
+	"fmt"
 	"html/template"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
+	"sync"
 
-	"github.com/markbates/going/randx"
 	"github.com/pkg/errors"
 )
+
+var once = &sync.Once{}
 
 type grifter struct {
 	CurrentDir        string
@@ -30,7 +33,7 @@ func newGrifter(name string) (*grifter, error) {
 	}
 	g.CurrentDir = pwd
 
-	stat, err := os.Stat(path.Join(pwd, "grifts"))
+	stat, err := os.Stat(filepath.Join(pwd, "grifts"))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory.", name)
@@ -42,9 +45,9 @@ func newGrifter(name string) (*grifter, error) {
 		return g, errors.New("There should be a directory named 'grifts', not a file.")
 	}
 
-	base := randx.String(10)
-	g.BuildPath = path.Join(os.Getenv("GOPATH"), "src", "grift.build", base)
-	g.GriftsPackagePath = path.Join("grift.build", base, "grifts")
+	base := filepath.Base(g.CurrentDir)
+	g.BuildPath = filepath.Join(os.Getenv("GOPATH"), "src", "grift.build", base)
+	g.GriftsPackagePath = filepath.Join("grift.build", base, "grifts")
 	return g, nil
 }
 
@@ -68,7 +71,7 @@ func (g *grifter) Build() error {
 		return err
 	}
 
-	f, err := os.Create(path.Join(g.BuildPath, "main.go"))
+	f, err := os.Create(filepath.Join(g.BuildPath, "main.go"))
 	if err != nil {
 		return err
 	}
@@ -78,7 +81,7 @@ func (g *grifter) Build() error {
 		return err
 	}
 
-	g.ExePath = path.Join(g.BuildPath, "main.go")
+	g.ExePath = filepath.Join(g.BuildPath, "main.go")
 	return nil
 }
 
@@ -87,6 +90,31 @@ func (g *grifter) TearDown() error {
 }
 
 func (g *grifter) copyGrifts() error {
-	cp := exec.Command("cp", "-rv", path.Join(g.CurrentDir, "grifts"), g.BuildPath)
-	return cp.Run()
+	var err error
+	cp := exec.Command("cp", "-rv", filepath.Join(g.CurrentDir, "grifts"), g.BuildPath)
+	cp.Stderr = os.Stderr
+	err = cp.Run()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	once.Do(func() {
+		vdir := filepath.Join(g.CurrentDir, "vendor")
+		if _, err := os.Stat(vdir); err == nil {
+			fmt.Println("Vendor directory found. Please be aware that this can slow down running of tasks.")
+			bdir := filepath.Join(g.BuildPath, "vendor")
+			err = os.RemoveAll(bdir)
+			if err != nil {
+				return
+			}
+			cp = exec.Command("ln", "-s", vdir, bdir)
+			cp.Stderr = os.Stderr
+			err = cp.Run()
+		}
+	})
+
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }

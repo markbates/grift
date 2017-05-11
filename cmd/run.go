@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 var currentGrift *grifter
@@ -48,13 +51,37 @@ func Run(name string, args []string) error {
 }
 
 func run(args []string) error {
-	rargs := []string{"run", currentGrift.ExePath}
-	rargs = append(rargs, args...)
+	pwd, err := os.Getwd()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	err = os.Chdir(currentGrift.BuildPath)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	rargs := []string{"build", "-i", "-o", "grifting"}
 	runner := exec.Command("go", rargs...)
 	runner.Stdin = os.Stdin
 	runner.Stdout = os.Stdout
 	runner.Stderr = os.Stderr
-	return runner.Run()
+	err = runner.Run()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	err = os.Chdir(pwd)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	runner = exec.Command(filepath.Join(currentGrift.BuildPath, "grifting"), args...)
+	runner.Stdin = os.Stdin
+	runner.Stdout = os.Stdout
+	runner.Stderr = os.Stderr
+	err = runner.Run()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }
 
 func list() error {
