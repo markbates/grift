@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/pkg/errors"
 )
@@ -26,6 +25,9 @@ func init() {
 }
 
 func Run(name string, args []string) error {
+	defer func() {
+		currentGrift.TearDown()
+	}()
 	if len(args) == 2 {
 		switch args[1] {
 		case "jim":
@@ -39,53 +41,34 @@ func Run(name string, args []string) error {
 
 	err := setup(name)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	err = run(args)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
-	return currentGrift.TearDown()
+	return nil
 }
 
 func run(args []string) error {
-	pwd, err := os.Getwd()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	err = os.Chdir(currentGrift.BuildPath)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	rargs := []string{"build", "-i", "-o", "grifting"}
+	rargs := []string{"run", exePath}
+	rargs = append(rargs, args...)
 	runner := exec.Command("go", rargs...)
 	runner.Stdin = os.Stdin
 	runner.Stdout = os.Stdout
 	runner.Stderr = os.Stderr
-	err = runner.Run()
+	err := runner.Run()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	err = os.Chdir(pwd)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	runner = exec.Command(filepath.Join(currentGrift.BuildPath, "grifting"), args...)
-	runner.Stdin = os.Stdin
-	runner.Stdout = os.Stdout
-	runner.Stderr = os.Stderr
-	err = runner.Run()
-	if err != nil {
-		return errors.WithStack(err)
-	}
 	return nil
 }
 
 func list() error {
-	rargs := []string{"run", currentGrift.ExePath, "list"}
+	rargs := []string{"run", exePath, "list"}
 	runner := exec.Command("go", rargs...)
 	runner.Stderr = os.Stderr
 	runner.Stdin = os.Stdin
@@ -97,11 +80,11 @@ func setup(name string) error {
 	var err error
 	currentGrift, err = newGrifter(name)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	err = currentGrift.Setup()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
-	return currentGrift.Build()
+	return nil
 }
