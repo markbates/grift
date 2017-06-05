@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,19 +9,6 @@ import (
 )
 
 var currentGrift *grifter
-
-func init() {
-	flag.Usage = func() {
-		fmt.Printf("Grift Version: %s\n", Version)
-
-		fmt.Print("\nUsage:\n")
-
-		fmt.Println("grift <task name> [task arguments]")
-
-		fmt.Println("\nFlags/Options:")
-		flag.PrintDefaults()
-	}
-}
 
 func Run(name string, args []string) error {
 	defer func() {
@@ -35,6 +21,12 @@ func Run(name string, args []string) error {
 			return nil
 		case "init":
 			generateInit()
+			return nil
+		case "--version", "-v":
+			fmt.Println(Version)
+			return nil
+		case "--help", "-h":
+			fmt.Println("grift <task name> [task arguments]")
 			return nil
 		}
 	}
