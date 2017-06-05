@@ -28,8 +28,8 @@ func Run(name string, args []string) error {
 	defer func() {
 		currentGrift.TearDown()
 	}()
-	if len(args) == 2 {
-		switch args[1] {
+	if len(args) == 1 {
+		switch args[0] {
 		case "jim":
 			jimTribute()
 			return nil
