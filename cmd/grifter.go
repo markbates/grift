@@ -42,7 +42,7 @@ func newGrifter(name string) (*grifter, error) {
 		return g, errors.New("there should be a directory named 'grifts', not a file")
 	}
 
-	g.GriftsPackagePath = filepath.Join(envy.CurrentPackage(), "grifts")
+	g.GriftsPackagePath = filepath.ToSlash(filepath.Join(envy.CurrentPackage(), "grifts"))
 	return g, nil
 }
 
