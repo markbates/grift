@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const exePath = "grift_runner.go"
+const exePath = ".grifter/main.go"
 
 var once = &sync.Once{}
 
@@ -52,6 +52,10 @@ func (g *grifter) Setup() error {
 		return errors.WithStack(err)
 	}
 
+	err = os.MkdirAll(filepath.Dir(exePath), 0755)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 	f, err := os.Create(exePath)
 	if err != nil {
 		return errors.WithStack(err)
@@ -66,5 +70,5 @@ func (g *grifter) Setup() error {
 }
 
 func (g *grifter) TearDown() error {
-	return os.RemoveAll(exePath)
+	return os.RemoveAll(filepath.Dir(exePath))
 }
