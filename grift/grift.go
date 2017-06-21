@@ -152,7 +152,7 @@ func List() []string {
 // Exec the grift stack. This is the main "entry point" to
 // the grift system.
 func Exec(args []string, verbose bool) error {
-	name := "default"
+	name := "list"
 	if len(args) >= 1 {
 		name = args[0]
 	}
