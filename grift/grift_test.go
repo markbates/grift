@@ -138,6 +138,44 @@ func Test_List(t *testing.T) {
 	reset()
 }
 
+func Test_Namespace(t *testing.T) {
+	r := require.New(t)
+	Add("b", func(c *Context) error {
+		return nil
+	})
+	Add("c", func(c *Context) error {
+		return nil
+	})
+
+	Namespace("a", func() {
+		Add("a", func(c *Context) error {
+			return nil
+		})
+		Add("d", func(c *Context) error {
+			return nil
+		})
+
+		Remove("b")
+		Remove(":c")
+
+		Namespace("e", func() {
+			Add("f", func(c *Context) error {
+				return nil
+			})
+
+			Rename("f", "g")
+
+			Remove(":d")
+
+		})
+
+	})
+
+	r.Equal([]string{"a:a", "a:d", "a:e:g", "b"}, List())
+
+	reset()
+}
+
 func Test_PrintGrifts(t *testing.T) {
 	r := require.New(t)
 
@@ -151,11 +189,7 @@ func Test_PrintGrifts(t *testing.T) {
 
 	bb := &bytes.Buffer{}
 	PrintGrifts(bb)
-
-	act := "grift a | AH!\ngrift b\n"
-
-	r.Equal(act, bb.String())
-
+	r.Equal("grift a    # AH!\ngrift b    # \n", bb.String())
 	reset()
 }
 
@@ -195,4 +229,5 @@ func Test_Exec(t *testing.T) {
 func reset() {
 	griftList = map[string]Grift{}
 	descriptions = map[string]string{}
+	namespace = ""
 }
