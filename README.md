@@ -40,12 +40,6 @@ When you run the `init` sub-command Grift will generate a new `grifts` package a
 $ grift list
 ```
 
-Grifts without descriptions are not shown by default. To show these, add the `-a` flag.
-
-```text
-$ grift list -a
-```
-
 #### Say Hello!
 
 ```text

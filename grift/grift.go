@@ -158,11 +158,7 @@ func Exec(args []string, verbose bool) error {
 	}
 	switch name {
 	case "list":
-		var showAll bool
-		if len(args) >= 2 && args[1] == "-a" {
-			showAll = true
-		}
-		PrintGrifts(os.Stdout, showAll)
+		PrintGrifts(os.Stdout)
 	default:
 		c := NewContext(name)
 		c.Verbose = verbose
@@ -176,28 +172,21 @@ func Exec(args []string, verbose bool) error {
 
 // PrintGrifts to the screen, nice, sorted, and with descriptions,
 // should they exist.
-func PrintGrifts(w io.Writer, all bool) {
+func PrintGrifts(w io.Writer) {
 	cnLen := len(CommandName)
 	maxLen := cnLen
 	l := List()
 
 	for _, k := range l {
-		if !all && descriptions[k] == "" {
-			continue
-		}
 		if (len(k) + cnLen) > maxLen {
 			maxLen = len(k) + cnLen
 		}
 	}
 
 	for _, k := range l {
-		if !all && descriptions[k] == "" {
-			continue
-		}
 		m := strings.Join([]string{CommandName, k}, " ")
 		suffix := strings.Repeat(" ", (maxLen+3)-len(m)) + " #"
 
 		fmt.Fprintln(w, strings.Join([]string{m, suffix, descriptions[k]}, " "))
-
 	}
 }
