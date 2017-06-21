@@ -4,9 +4,9 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
-	"github.com/gobuffalo/envy"
 	"github.com/pkg/errors"
 )
 
@@ -20,29 +20,47 @@ type grifter struct {
 	Verbose           bool
 }
 
+func hasGriftDir(path string) bool {
+	stat, err := os.Stat(filepath.Join(path, "grifts"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+		return false
+	}
+
+	if !stat.IsDir() {
+		return false
+	}
+
+	return true
+
+}
+
 func newGrifter(name string) (*grifter, error) {
 	g := &grifter{
 		CommandName: name,
 	}
 
-	pwd, err := os.Getwd()
+	path, err := os.Getwd()
 	if err != nil {
 		return g, errors.WithStack(err)
 	}
 
-	stat, err := os.Stat(filepath.Join(pwd, "grifts"))
-	if err != nil {
-		if os.IsNotExist(err) {
-			return g, errors.Errorf("there is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
+	for !strings.HasSuffix(path, "/src") && path != "/" {
+		if hasGriftDir(path) {
+			break
 		}
-		return g, err
+
+		path = filepath.Dir(path)
 	}
 
-	if !stat.IsDir() {
-		return g, errors.New("there should be a directory named 'grifts', not a file")
+	p := strings.SplitN(path, "/src/", 2)
+	if len(p) == 1 {
+		return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
 	}
 
-	g.GriftsPackagePath = filepath.ToSlash(filepath.Join(envy.CurrentPackage(), "grifts"))
+	g.GriftsPackagePath = filepath.ToSlash(filepath.Join(p[1], "grifts"))
 	return g, nil
 }
 
