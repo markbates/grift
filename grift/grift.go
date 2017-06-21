@@ -16,7 +16,6 @@ var griftList = map[string]Grift{}
 var descriptions = map[string]string{}
 var lock = &sync.Mutex{}
 var namespace string
-var maxNameLen int
 
 type Grift func(c *Context) error
 
@@ -41,7 +40,6 @@ func applyNamespace(name string) string {
 			return name
 		}
 		return fmt.Sprintf("%s:%s", namespace, name)
-
 	}
 
 	return name
@@ -55,9 +53,6 @@ func Add(name string, grift Grift) error {
 	defer lock.Unlock()
 
 	name = applyNamespace(name)
-	if len(name) > maxNameLen {
-		maxNameLen = len(name)
-	}
 
 	if griftList[name] != nil {
 		fn := griftList[name]
@@ -164,7 +159,11 @@ func Exec(args []string, verbose bool) error {
 	}
 	switch name {
 	case "list":
-		PrintGrifts(os.Stdout)
+		var showAll bool
+		if len(args) >= 2 && args[1] == "-a" {
+			showAll = true
+		}
+		PrintGrifts(os.Stdout, showAll)
 	default:
 		c := NewContext(name)
 		c.Verbose = verbose
@@ -178,13 +177,28 @@ func Exec(args []string, verbose bool) error {
 
 // PrintGrifts to the screen, nice, sorted, and with descriptions,
 // should they exist.
-func PrintGrifts(w io.Writer) {
-	for _, k := range List() {
-		m := fmt.Sprintf("%s %s", CommandName, k)
-		desc := descriptions[k]
-		if desc != "" {
-			m = fmt.Sprintf("%s | %s", m, desc)
+func PrintGrifts(w io.Writer, all bool) {
+	cnLen := len(CommandName)
+	maxLen := cnLen
+	l := List()
+
+	for _, k := range l {
+		if !all && descriptions[k] == "" {
+			continue
 		}
-		fmt.Fprintln(w, m)
+		if (len(k) + cnLen) > maxLen {
+			maxLen = len(k) + cnLen
+		}
+	}
+
+	for _, k := range l {
+		if !all && descriptions[k] == "" {
+			continue
+		}
+		m := strings.Join([]string{CommandName, k}, " ")
+		suffix := strings.Repeat(" ", (maxLen+3)-len(m)) + " #"
+
+		fmt.Fprintln(w, strings.Join([]string{m, suffix, descriptions[k]}, " "))
+
 	}
 }
