@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 )
@@ -14,8 +15,37 @@ var CommandName = "grift"
 var griftList = map[string]Grift{}
 var descriptions = map[string]string{}
 var lock = &sync.Mutex{}
+var namespace string
+var maxNameLen int
 
 type Grift func(c *Context) error
+
+// Create a namespace. All tasks within the
+// namespace will share the same prefix.
+func Namespace(name string, s func()) error {
+	defer func() {
+		namespace = ""
+	}()
+
+	namespace = applyNamespace(name)
+	s()
+	return nil
+}
+
+func applyNamespace(name string) string {
+	if namespace != "" {
+		if strings.HasPrefix(name, ":") {
+			return name[1:]
+		}
+		if name == "default" {
+			return name
+		}
+		return fmt.Sprintf("%s:%s", namespace, name)
+
+	}
+
+	return name
+}
 
 // Add a grift. If there is already a grift
 // with the given name the two grifts will
@@ -23,6 +53,12 @@ type Grift func(c *Context) error
 func Add(name string, grift Grift) error {
 	lock.Lock()
 	defer lock.Unlock()
+
+	name = applyNamespace(name)
+	if len(name) > maxNameLen {
+		maxNameLen = len(name)
+	}
+
 	if griftList[name] != nil {
 		fn := griftList[name]
 		griftList[name] = func(c *Context) error {
@@ -43,6 +79,7 @@ func Add(name string, grift Grift) error {
 func Set(name string, grift Grift) error {
 	lock.Lock()
 	defer lock.Unlock()
+	name = applyNamespace(name)
 	griftList[name] = grift
 	return nil
 }
@@ -53,6 +90,10 @@ func Set(name string, grift Grift) error {
 func Rename(old string, new string) error {
 	lock.Lock()
 	defer lock.Unlock()
+
+	old = applyNamespace(old)
+	new = applyNamespace(new)
+
 	if griftList[old] == nil {
 		return fmt.Errorf("No task named %s defined!", old)
 	}
@@ -66,6 +107,9 @@ func Rename(old string, new string) error {
 func Remove(name string) error {
 	lock.Lock()
 	defer lock.Unlock()
+
+	name = applyNamespace(name)
+
 	delete(griftList, name)
 	delete(descriptions, name)
 	return nil
@@ -77,6 +121,9 @@ func Remove(name string) error {
 func Desc(name string, description string) error {
 	lock.Lock()
 	defer lock.Unlock()
+
+	name = applyNamespace(name)
+
 	descriptions[name] = description
 	return nil
 }
@@ -84,6 +131,8 @@ func Desc(name string, description string) error {
 // Run a grift. This allows for the chaining for grifts.
 // One grift can Run another grift and so on.
 func Run(name string, c *Context) error {
+	name = applyNamespace(name)
+
 	if griftList[name] == nil {
 		return fmt.Errorf("No task named '%s' defined!", name)
 	}

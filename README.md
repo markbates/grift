@@ -105,11 +105,12 @@ var _ = Add("env:print", func(c *Context) error {
 	return nil
 })
 
-var _ = Desc("db:migrate", "Migrates the databases")
-var _ = Set("db:migrate", func(c *Context) error {
-	fmt.Println("db:migrate")
-	fmt.Printf("### args -> %+v\n", c.Args)
-	return nil
-})
-
+var _ = Namespace("db", func() {
+    Desc("migrate", "Migrates the databases")
+    Set("migrate", func(c *Context) error {
+            fmt.Println("db:migrate")
+            fmt.Printf("### args -> %+v\n", c.Args)
+            return nil
+    })
+}
 ```
