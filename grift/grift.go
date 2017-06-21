@@ -19,8 +19,7 @@ var namespace string
 
 type Grift func(c *Context) error
 
-// Create a namespace. All tasks within the
-// namespace will share the same prefix.
+// Namespace will place all tasks within the given prefix.
 func Namespace(name string, s func()) error {
 	defer func() {
 		namespace = ""
@@ -82,18 +81,18 @@ func Set(name string, grift Grift) error {
 // Rename a grift. Useful if you want to re-define
 // an existing grift, but don't want to write over
 // the original.
-func Rename(old string, new string) error {
+func Rename(oldName string, newName string) error {
 	lock.Lock()
 	defer lock.Unlock()
 
-	old = applyNamespace(old)
-	new = applyNamespace(new)
+	oldName = applyNamespace(oldName)
+	newName = applyNamespace(newName)
 
-	if griftList[old] == nil {
-		return fmt.Errorf("No task named %s defined!", old)
+	if griftList[oldName] == nil {
+		return fmt.Errorf("No task named %s defined!", oldName)
 	}
-	griftList[new] = griftList[old]
-	delete(griftList, old)
+	griftList[newName] = griftList[oldName]
+	delete(griftList, oldName)
 	return nil
 }
 
