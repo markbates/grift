@@ -15,9 +15,10 @@ const exePath = ".grifter/main.go"
 var once = &sync.Once{}
 
 type grifter struct {
-	GriftsPackagePath string
-	CommandName       string
-	Verbose           bool
+	GriftsPackagePath  string
+	CommandName        string
+	Verbose            bool
+	GriftsAbsolutePath string
 }
 
 func hasGriftDir(path string) bool {
@@ -59,7 +60,7 @@ func newGrifter(name string) (*grifter, error) {
 	if len(p) == 1 {
 		return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
 	}
-
+	g.GriftsAbsolutePath = filepath.ToSlash(filepath.Join(path, "grifts"))
 	g.GriftsPackagePath = filepath.ToSlash(filepath.Join(p[1], "grifts"))
 	return g, nil
 }
