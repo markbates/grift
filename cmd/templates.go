@@ -7,9 +7,13 @@ import _ "{{.GriftsPackagePath}}"
 import "os"
 import "log"
 import "github.com/markbates/grift/grift"
+import "path/filepath"
 
 func main() {
 	grift.CommandName = "{{.CommandName}}"
+	if err := os.Chdir(filepath.Dir("{{.GriftsAbsolutePath}}")); err != nil {
+	  log.Fatal(err)
+	}
 	err := grift.Exec(os.Args[1:], false)
 	if err != nil {
 		log.Fatal(err)
