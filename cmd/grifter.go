@@ -56,7 +56,7 @@ func newGrifter(name string) (*grifter, error) {
 		path = filepath.Dir(path)
 	}
 
-	p := strings.SplitN(path, "/src/", 2)
+	p := strings.SplitN(path, filepath.FromSlash("/src/"), 2)
 	if len(p) == 1 {
 		return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
 	}
