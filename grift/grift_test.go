@@ -198,19 +198,15 @@ func Test_Exec(t *testing.T) {
 
 	var name string
 	var args []string
-	Add("default", func(c *Context) error {
-		name = c.Name
-		args = c.Args
-		return nil
-	})
+
 	Add("hello", func(c *Context) error {
 		name = c.Name
 		args = c.Args
 		return nil
 	})
-	t.Run("default", func(st *testing.T) {
+	t.Run("list", func(st *testing.T) {
 		Exec([]string{}, false)
-		r.Equal("default", name)
+		r.Equal("", name)
 		r.Empty(args)
 	})
 	t.Run("name grift", func(st *testing.T) {
