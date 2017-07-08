@@ -173,6 +173,8 @@ func Exec(args []string, verbose bool) error {
 // PrintGrifts to the screen, nice, sorted, and with descriptions,
 // should they exist.
 func PrintGrifts(w io.Writer) {
+	fmt.Fprint(w, "Available grifts\n================\n")
+
 	cnLen := len(CommandName)
 	maxLen := cnLen
 	l := List()
