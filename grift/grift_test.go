@@ -189,7 +189,7 @@ func Test_PrintGrifts(t *testing.T) {
 
 	bb := &bytes.Buffer{}
 	PrintGrifts(bb)
-	r.Equal("grift a    # AH!\ngrift b    # \n", bb.String())
+	r.Equal("Available grifts\n================\ngrift a    # AH!\ngrift b    # \n", bb.String())
 	reset()
 }
 
