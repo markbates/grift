@@ -66,7 +66,6 @@ func newGrifter(name string) (*grifter, error) {
 }
 
 func (g *grifter) Setup() error {
-	defer g.TearDown()
 	t, err := template.New("main").Parse(mainTmpl)
 	if err != nil {
 		return errors.WithStack(err)
