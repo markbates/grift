@@ -128,6 +128,10 @@ func Run(name string, c *Context) error {
 	name = applyNamespace(name)
 
 	if griftList[name] == nil {
+		if name == "list" {
+			PrintGrifts(os.Stdout)
+			return nil
+		}
 		return fmt.Errorf("No task named '%s' defined!", name)
 	}
 	if c.Verbose {
