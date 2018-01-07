@@ -197,9 +197,10 @@ func PrintGrifts(w io.Writer) {
 		fmt.Fprintln(w, strings.Join([]string{m, suffix, descriptions[k]}, " "))
 	}
 }
+
 // RunSource executes the command passed as argument,
 // in the current shell/context
-func RunSource(cmd exec.Command) error{
+func RunSource(cmd *exec.Cmd) error {
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
