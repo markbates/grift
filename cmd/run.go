@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os/exec"
 
 	"github.com/markbates/grift/grift"
@@ -45,7 +47,14 @@ func Run(name string, args []string) error {
 }
 
 func run(args []string) error {
-	rargs := []string{"run", exePath}
+	rargs := []string{"run"}
+	// Test for special cases requiring sqlite build tag
+	if b, err := ioutil.ReadFile("database.yml"); err == nil {
+		if bytes.Contains(b, []byte("sqlite")) {
+			rargs = append(rargs, "-tags", "sqlite")
+		}
+	}
+	rargs = append(rargs, exePath)
 	rargs = append(rargs, args...)
 	if err := grift.RunSource(exec.Command("go", rargs...)); err != nil {
 		return errors.WithStack(err)
