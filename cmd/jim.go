@@ -13,8 +13,7 @@ was lucky to have, Jim Weirich.
 
 We miss you Jim.
 
-https://en.wikipedia.org/wiki/Jim_Weirich
-`)
+https://en.wikipedia.org/wiki/Jim_Weirich`)
 }
 
 var jim = `
