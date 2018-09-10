@@ -3,6 +3,7 @@ package cmd
 import (
 	"html/template"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -43,25 +44,34 @@ func newGrifter(name string) (*grifter, error) {
 		CommandName: name,
 	}
 
-	path, err := os.Getwd()
+	currentPath, err := os.Getwd()
 	if err != nil {
 		return g, errors.WithStack(err)
 	}
 
-	for !strings.HasSuffix(path, "/src") && path != "/" {
-		if hasGriftDir(path) {
-			break
+	if strings.HasPrefix(currentPath, os.Getenv("GOPATH")) {
+		for !strings.HasSuffix(currentPath, "/src") && currentPath != "/" {
+			if hasGriftDir(currentPath) {
+				break
+			}
+
+			currentPath = filepath.Dir(currentPath)
 		}
-
-		path = filepath.Dir(path)
+		p := strings.SplitN(currentPath, filepath.FromSlash("/src/"), 2)
+		if len(p) == 1 {
+			return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
+		}
+		g.GriftsAbsolutePath = filepath.ToSlash(filepath.Join(currentPath, "grifts"))
+		g.GriftsPackagePath = filepath.ToSlash(filepath.Join(p[1], "grifts"))
+	} else {
+		//is outside of gopath, dont loop to parent
+		if !hasGriftDir(currentPath) {
+			return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
+		}
+		g.GriftsAbsolutePath = filepath.ToSlash(filepath.Join(currentPath, "grifts"))
+		g.GriftsPackagePath = filepath.ToSlash(filepath.Join(path.Base(currentPath), "grifts"))
 	}
 
-	p := strings.SplitN(path, filepath.FromSlash("/src/"), 2)
-	if len(p) == 1 {
-		return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
-	}
-	g.GriftsAbsolutePath = filepath.ToSlash(filepath.Join(path, "grifts"))
-	g.GriftsPackagePath = filepath.ToSlash(filepath.Join(p[1], "grifts"))
 	return g, nil
 }
 
