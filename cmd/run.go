@@ -49,7 +49,11 @@ func Run(name string, args []string) error {
 func run(args []string) error {
 	rargs := []string{"run"}
 	// Test for special cases requiring sqlite build tag
-	if b, err := ioutil.ReadFile("database.yml"); err == nil {
+	b, err := ioutil.ReadFile("database.yml")
+	if err != nil {
+		b, err = ioutil.ReadFile("config/database.yml")
+	}
+	if err == nil {
 		if bytes.Contains(b, []byte("sqlite")) {
 			rargs = append(rargs, "-tags", "sqlite")
 		}
