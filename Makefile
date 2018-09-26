@@ -19,7 +19,7 @@ test:
 	packr
 	$(GO_BIN) test -tags ${TAGS} ./...
 
-ci-test: deps
+ci-test:
 	$(GO_BIN) test -tags ${TAGS} -race ./...
 
 lint:
