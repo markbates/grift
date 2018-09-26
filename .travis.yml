@@ -8,7 +8,7 @@ go:
   - 1.11.x
   - tip
 
-scripte: make ci-test
+script: make ci-test
 
 matrix:
   allow_failures:
