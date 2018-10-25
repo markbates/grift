@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/rogpeppe/go-internal/modfile"
 	"html/template"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -71,18 +72,22 @@ func newGrifter(name string) (*grifter, error) {
 		}
 		g.GriftsAbsolutePath = filepath.ToSlash(filepath.Join(currentPath, "grifts"))
 
-		if f, err := os.Open("go.mod"); err == nil {
-			//go.mod exists, take package path from it
-			reader := bufio.NewReader(f)
-			first, err := reader.ReadString('\n')
+		// check for go module to see if we can get go.mod
+		if os.Getenv("GO111MODULE") == "on" {
+			moddata, err := ioutil.ReadFile("go.mod")
 			if err != nil {
-				return g, errors.New("Cannot read go.mod")
+				return g, errors.New("go.mod cannot be read or does not exist while go module is enabled.")
 			}
-			packagePath := strings.TrimSuffix(strings.Split(first, " ")[1], "\n")
+			packagePath := modfile.ModulePath(moddata)
+			if packagePath == "" {
+				return g, errors.New("go.mod is malformed.")
+			}
 			g.GriftsPackagePath = fmt.Sprintf("%s/grifts", packagePath)
 		} else {
+			// no go module, infer package path from current directory
 			g.GriftsPackagePath = filepath.ToSlash(filepath.Join(path.Base(currentPath), "grifts"))
 		}
+
 
 	}
 
@@ -94,6 +99,7 @@ func (g *grifter) Setup() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	err = os.MkdirAll(filepath.Dir(exePath), 0755)
 	if err != nil {
 		return errors.WithStack(err)
@@ -107,9 +113,11 @@ func (g *grifter) Setup() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	return nil
 }
 
 func (g *grifter) TearDown() error {
 	return os.RemoveAll(filepath.Dir(exePath))
 }
+
