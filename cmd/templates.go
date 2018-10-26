@@ -1,5 +1,7 @@
 package cmd
 
+var modTmpl = `module grifter`
+
 var mainTmpl = `
 package main
 
