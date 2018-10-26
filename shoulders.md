@@ -5,12 +5,20 @@ github.com/markbates/grift does not try to reinvent the wheel! Instead, it uses 
 Thank you to the following **GIANTS**:
 
 
+* [github.com/gobuffalo/envy](https://godoc.org/github.com/gobuffalo/envy)
+
+* [github.com/joho/godotenv](https://godoc.org/github.com/joho/godotenv)
+
+* [github.com/markbates/grift](https://godoc.org/github.com/markbates/grift)
+
+* [github.com/markbates/grift/cmd](https://godoc.org/github.com/markbates/grift/cmd)
+
+* [github.com/markbates/grift/grift](https://godoc.org/github.com/markbates/grift/grift)
+
 * [github.com/pkg/errors](https://godoc.org/github.com/pkg/errors)
 
-* [github.com/stretchr/testify/assert](https://godoc.org/github.com/stretchr/testify/assert)
+* [github.com/rogpeppe/go-internal/modfile](https://godoc.org/github.com/rogpeppe/go-internal/modfile)
 
-* [github.com/stretchr/testify/require](https://godoc.org/github.com/stretchr/testify/require)
+* [github.com/rogpeppe/go-internal/module](https://godoc.org/github.com/rogpeppe/go-internal/module)
 
-* [github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew](https://godoc.org/github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew)
-
-* [github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib](https://godoc.org/github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib)
+* [github.com/rogpeppe/go-internal/semver](https://godoc.org/github.com/rogpeppe/go-internal/semver)
