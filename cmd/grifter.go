@@ -77,10 +77,12 @@ func newGrifter(name string) (*grifter, error) {
 		// check for go module to see if we can get go.mod
 		if envy.Mods() {
 			moddata, err := ioutil.ReadFile("go.mod")
+			fmt.Println("### moddata ->", moddata)
 			if err != nil {
 				return g, errors.New("go.mod cannot be read or does not exist while go module is enabled.")
 			}
 			packagePath := modfile.ModulePath(moddata)
+			fmt.Println("### packagePath ->", packagePath)
 			if packagePath == "" {
 				return g, errors.New("go.mod is malformed.")
 			}
@@ -90,6 +92,7 @@ func newGrifter(name string) (*grifter, error) {
 			g.GriftsPackagePath = filepath.ToSlash(filepath.Join(path.Base(currentPath), "grifts"))
 		}
 
+		fmt.Println("### g.GriftsPackagePath ->", g.GriftsPackagePath)
 	}
 
 	return g, nil
