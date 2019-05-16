@@ -53,7 +53,8 @@ func newGrifter(name string) (*grifter, error) {
 		return g, errors.WithStack(err)
 	}
 
-	if strings.HasPrefix(currentPath, os.Getenv("GOPATH")) {
+	if envy.InGoPath() {
+		// pwd is inside a GOPATH
 		for !strings.HasSuffix(currentPath, "/src") && currentPath != "/" {
 			if hasGriftDir(currentPath) {
 				break
@@ -68,7 +69,7 @@ func newGrifter(name string) (*grifter, error) {
 		g.GriftsAbsolutePath = filepath.ToSlash(filepath.Join(currentPath, "grifts"))
 		g.GriftsPackagePath = filepath.ToSlash(filepath.Join(p[1], "grifts"))
 	} else {
-		//is outside of gopath, dont loop to parent
+		// is outside of gopath, dont loop to parent
 		if !hasGriftDir(currentPath) {
 			return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
 		}
