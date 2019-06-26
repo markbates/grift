@@ -7,8 +7,6 @@ Thank you to the following **GIANTS**:
 
 * [github.com/gobuffalo/envy](https://godoc.org/github.com/gobuffalo/envy)
 
-* [github.com/pkg/errors](https://godoc.org/github.com/pkg/errors)
-
 * [github.com/rogpeppe/go-internal](https://godoc.org/github.com/rogpeppe/go-internal)
 
 * [github.com/stretchr/testify](https://godoc.org/github.com/stretchr/testify)
