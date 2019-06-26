@@ -7,7 +7,6 @@ import (
 	"os/exec"
 
 	"github.com/markbates/grift/grift"
-	"github.com/pkg/errors"
 )
 
 var currentGrift *grifter
@@ -35,12 +34,12 @@ func Run(name string, args []string) error {
 
 	err := setup(name)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	err = run(args)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	return nil
@@ -61,7 +60,7 @@ func run(args []string) error {
 	rargs = append(rargs, exePath)
 	rargs = append(rargs, args...)
 	if err := grift.RunSource(exec.Command("go", rargs...)); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	return nil
 }
@@ -75,11 +74,11 @@ func setup(name string) error {
 	var err error
 	currentGrift, err = newGrifter(name)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	err = currentGrift.Setup()
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	return nil
 }

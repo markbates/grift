@@ -11,7 +11,6 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/envy"
-	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/modfile"
 )
 
@@ -50,7 +49,7 @@ func newGrifter(name string) (*grifter, error) {
 
 	currentPath, err := os.Getwd()
 	if err != nil {
-		return g, errors.WithStack(err)
+		return g, err
 	}
 
 	if envy.InGoPath() {
@@ -64,14 +63,14 @@ func newGrifter(name string) (*grifter, error) {
 		}
 		p := strings.SplitN(currentPath, filepath.FromSlash("/src/"), 2)
 		if len(p) == 1 {
-			return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
+			return g, fmt.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
 		}
 		g.GriftsAbsolutePath = filepath.ToSlash(filepath.Join(currentPath, "grifts"))
 		g.GriftsPackagePath = filepath.ToSlash(filepath.Join(p[1], "grifts"))
 	} else {
 		// is outside of gopath, dont loop to parent
 		if !hasGriftDir(currentPath) {
-			return g, errors.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
+			return g, fmt.Errorf("There is no directory named 'grifts'. Run '%s init' or switch to the appropriate directory", name)
 		}
 		g.GriftsAbsolutePath = filepath.ToSlash(filepath.Join(currentPath, "grifts"))
 
@@ -79,11 +78,11 @@ func newGrifter(name string) (*grifter, error) {
 		if envy.Mods() {
 			moddata, err := ioutil.ReadFile("go.mod")
 			if err != nil {
-				return g, errors.New("go.mod cannot be read or does not exist while go module is enabled.")
+				return g, fmt.Errorf("go.mod cannot be read or does not exist while go module is enabled.")
 			}
 			packagePath := modfile.ModulePath(moddata)
 			if packagePath == "" {
-				return g, errors.New("go.mod is malformed.")
+				return g, fmt.Errorf("go.mod is malformed.")
 			}
 			g.GriftsPackagePath = fmt.Sprintf("%s/grifts", packagePath)
 		} else {
@@ -101,7 +100,7 @@ func (g *grifter) Setup() error {
 	root := filepath.Dir(exePath)
 	err := os.MkdirAll(root, 0755)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	tmpls := map[string]string{}
@@ -112,17 +111,17 @@ func (g *grifter) Setup() error {
 	for k, v := range tmpls {
 		t, err := template.New(k).Parse(v)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		f, err := os.Create(k)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		err = t.Execute(f, g)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 	}
 
