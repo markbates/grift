@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 
 	"github.com/gobuffalo/here"
@@ -18,23 +19,12 @@ func Run(ctx context.Context, args []string) error {
 		return err
 	}
 
-	if info.Name != "grifts" {
-		d := filepath.Join(info.Dir, "grifts")
-		if _, err := os.Stat(d); err != nil {
-			return err
-		}
-		info, err = h.Dir(d)
-		if err != nil {
-			return err
-		}
-	}
-
 	k := struct {
 		Pkg     string
 		Command string
 		Dir     string
 	}{
-		Pkg:     info.ImportPath,
+		Pkg:     path.Join(info.ImportPath, "grifts"),
 		Command: "grift",
 		Dir:     info.Dir,
 	}

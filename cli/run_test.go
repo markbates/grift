@@ -3,6 +3,8 @@ package cli
 import (
 	"bytes"
 	"context"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -19,7 +21,12 @@ func Test_Run(t *testing.T) {
 
 	args := []string{"db:seed", "1", "2", "3"}
 
-	err := Run(ctx, args)
+	pwd, err := os.Getwd()
+	r.NoError(err)
+	defer os.Chdir(pwd)
+	os.Chdir(filepath.Dir(pwd))
+
+	err = Run(ctx, args)
 	r.NoError(err)
 
 	act := strings.TrimSpace(bb.String())

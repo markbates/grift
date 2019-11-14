@@ -3,6 +3,8 @@ package cli
 import (
 	"bytes"
 	"context"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -39,6 +41,11 @@ func Test_Main_Version(t *testing.T) {
 
 func Test_Main_Task(t *testing.T) {
 	r := require.New(t)
+
+	pwd, err := os.Getwd()
+	r.NoError(err)
+	defer os.Chdir(pwd)
+	os.Chdir(filepath.Dir(pwd))
 
 	bb := &bytes.Buffer{}
 	ctx := WithStdout(bb, context.Background())
