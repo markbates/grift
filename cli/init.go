@@ -1,26 +1,30 @@
-package cmd
+package cli
 
-var modTmpl = `module grifter`
+import (
+	"context"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+)
 
-var mainTmpl = `
-package main
-
-import _ "{{.GriftsPackagePath}}"
-import "os"
-import "log"
-import "github.com/markbates/grift/grift"
-import "path/filepath"
-
-func main() {
-	grift.CommandName = "{{.CommandName}}"
-	if err := os.Chdir(filepath.Dir("{{.GriftsAbsolutePath}}")); err != nil {
-	  log.Fatal(err)
+func Init(ctx context.Context, args []string) error {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
-	err := grift.Exec(os.Args[1:], false)
+
+	dir := filepath.Join(pwd, "grifts")
+	if err := os.MkdirAll(dir, 0766); err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(dir, "example.go"), []byte(initTmpl), 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-}`
+	return nil
+}
 
 var initTmpl = `
 package grifts
