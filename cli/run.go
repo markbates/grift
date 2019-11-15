@@ -29,6 +29,10 @@ func Run(ctx context.Context, args []string) error {
 		Dir:     info.Dir,
 	}
 
+	if s, ok := ctx.Value("command").(string); ok {
+		k.Command = s
+	}
+
 	od := filepath.Join(info.Dir, ".grifter")
 	out := filepath.Join(od, "main.go")
 
