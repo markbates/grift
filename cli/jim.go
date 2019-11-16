@@ -1,11 +1,15 @@
-package cmd
+package cli
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+)
 
-func jimTribute() {
-	fmt.Println(jim)
+func Jim(ctx context.Context, args []string) error {
+	stdout := Stdout(ctx)
+	fmt.Fprintln(stdout, jim)
 
-	fmt.Println(`
+	fmt.Fprintln(stdout, `
 Grift was inspired by the Ruby program, Rake. (http://rake.rubyforge.org)
 
 Rake was written by one of the kindest and generous people any tech community
@@ -14,6 +18,8 @@ was lucky to have, Jim Weirich.
 We miss you Jim.
 
 https://en.wikipedia.org/wiki/Jim_Weirich`)
+
+	return nil
 }
 
 var jim = `
