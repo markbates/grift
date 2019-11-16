@@ -5,8 +5,22 @@ github.com/markbates/grift does not try to reinvent the wheel! Instead, it uses 
 Thank you to the following **GIANTS**:
 
 
-* [github.com/gobuffalo/envy](https://godoc.org/github.com/gobuffalo/envy)
+* [github.com/davecgh/go-spew](https://godoc.org/github.com/davecgh/go-spew)
 
-* [github.com/rogpeppe/go-internal](https://godoc.org/github.com/rogpeppe/go-internal)
+* [github.com/gobuffalo/here](https://godoc.org/github.com/gobuffalo/here)
+
+* [github.com/kr/pretty](https://godoc.org/github.com/kr/pretty)
+
+* [github.com/kr/pty](https://godoc.org/github.com/kr/pty)
+
+* [github.com/kr/text](https://godoc.org/github.com/kr/text)
+
+* [github.com/pmezard/go-difflib](https://godoc.org/github.com/pmezard/go-difflib)
+
+* [github.com/stretchr/objx](https://godoc.org/github.com/stretchr/objx)
 
 * [github.com/stretchr/testify](https://godoc.org/github.com/stretchr/testify)
+
+* [gopkg.in/check.v1](https://godoc.org/gopkg.in/check.v1)
+
+* [gopkg.in/yaml.v2](https://godoc.org/gopkg.in/yaml.v2)
