@@ -151,6 +151,12 @@ func Test_Namespace(t *testing.T) {
 		Add("a", func(c *Context) error {
 			return nil
 		})
+		Add("b", func(c *Context) error {
+			return nil
+		})
+		Add("c", func(c *Context) error {
+			return nil
+		})
 		Add("d", func(c *Context) error {
 			return nil
 		})
@@ -169,9 +175,12 @@ func Test_Namespace(t *testing.T) {
 
 		})
 
+		Add("h", func(c *Context) error {
+			return nil
+		})
 	})
 
-	r.Equal([]string{"a:a", "a:d", "a:e:g", "b"}, List())
+	r.Equal([]string{"a:a", "a:c", "a:d", "a:e:g", "a:h", "b"}, List())
 
 	reset()
 }
