@@ -22,8 +22,9 @@ type Grift func(c *Context) error
 
 // Namespace will place all tasks within the given prefix.
 func Namespace(name string, s func()) error {
+	saved := namespace
 	defer func() {
-		namespace = ""
+		namespace = saved
 	}()
 
 	namespace = applyNamespace(name)
